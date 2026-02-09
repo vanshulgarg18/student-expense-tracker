@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-form {
+      background: #fff;
+      padding: 25px 40px; /* Added more horizontal padding */
+      border-radius: 12px;
+      box-shadow: 0 4px M10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .login-form h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 12px; /* Increased padding */
+      margin-top: 10px; /* Spacing between inputs */
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box; /* Ensures padding doesn't affect width */
+    }
+
+    .login-form button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #00a8cc;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .login-form button:hover {
+      background-color: #0088aa;
+    }
+
+    .signup-link {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .signup-link a {
+      color: #00a8cc;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    #errorMsg {
+      text-align: center;
+      color: red;
+      margin-top: 10px;
+      min-height: 1.2em; /* Prevents layout shift when message appears */
+    }
+  </style>
+</head>
+<body>
+<div class="login-form">
+  <h2>Login</h2>
+  <form action="/login" method="POST">
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+
+  <div id="errorMsg"></div>
+
+  <div class="signup-link">
+    <p>Don’t have an account? <a href="signup.html">Sign up</a></p>
+  </div>
+</div>
+
+<script>
+
+  const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('error')) {
+        document.getElementById('errorMsg').innerText = 'Invalid username or password.';
+    }
+
+</script>
+</body>
+</html>

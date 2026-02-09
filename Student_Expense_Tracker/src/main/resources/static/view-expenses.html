@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Expenses</title>
+    <style>
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+          background: #fff;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+          padding: 12px 15px;
+          text-align: left;
+        }
+
+        th {
+          background-color: #00a8cc;
+          color: #fff;
+          font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+          background-color: #f8f8f8;
+        }
+
+        tr:hover {
+          background-color: #e8f6f9;
+        }
+
+        .actions button {
+          padding: 6px 12px;
+          margin-right: 5px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          color: white;
+        }
+
+        .edit-btn {
+          background-color: #00a8cc;
+        }
+
+        .delete-btn {
+          background-color: #d9534f;
+        }
+
+        .links {
+          margin-top: 15px;
+          text-align: center;
+        }
+
+        .links a {
+          color: #00a8cc;
+          font-weight: bold;
+          text-decoration: none;
+          margin: 0 10px;
+        }
+
+        .links a:hover {
+          text-decoration: underline;
+        }
+
+
+         .navbar {
+      background: #00a8cc;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .navbar a {
+      color: white;
+      margin-left: 15px;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .navbar a:hover {
+      background: #0088aa;
+    }
+
+    .navbar .right {
+      display: flex;
+      align-items: center;
+    }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="navbar">
+        <div class="left">
+            Expense Tracker
+        </div>
+        <div class="right">
+<!--            <a href="view-expenses.html">Expenses</a>-->
+            <a href="add-expense.html">Add Expense</a>
+            <a href="profile.html">Profile</a>   <!-- Profile button -->
+            <a href="login.html" onclick="logout()">Logout</a>
+        </div>
+    </div>
+    <br><br>
+    <h2><center>Your Expenses</center</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Amount ($)</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="expenseTableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    async function loadExpenses() {
+      const res = await fetch('/api/expenses',{
+        method: "GET",
+        credentials: "include"
+      });
+      const data = await res.json();
+      const tbody = document.getElementById('expenseTableBody');
+      tbody.innerHTML = "";
+      data.forEach(exp => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><strong>${exp.title}</strong></td>
+          <td>${exp.description}</td>
+          <td>${exp.amount.toFixed(2)}</td>
+          <td class="actions">
+            <button class="edit-btn" onclick="editExpense(${exp.id}, '${exp.title}', '${exp.description}', ${exp.amount})">Edit</button>
+            <button class="delete-btn" onclick="deleteExpense(${exp.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function editExpense(id, oldTitle, oldDesc, oldAmt) {
+      const newTitle = prompt("Enter new title", oldTitle);
+      const newDesc = prompt("Enter new description", oldDesc);
+      const newAmt = prompt("Enter new amount", oldAmt);
+      if (newTitle && newDesc && newAmt) {
+        await fetch('/api/expenses/' + id, {
+          method: 'PUT',
+          headers: { "Content-Type": "application/json"},
+          credentials: "include",
+          body: JSON.stringify({
+            title: newTitle,
+            description: newDesc,
+            amount: newAmt
+          })
+        });
+        loadExpenses();
+      }
+    }
+
+    async function deleteExpense(id) {
+      if (confirm("Delete this expense?")) {
+        await fetch('/api/expenses/' + id, {
+            method: 'DELETE',
+            credentials: "include"
+        });
+        loadExpenses();
+      }
+    }
+
+    loadExpenses();
+</script>
+</body>
+</html>

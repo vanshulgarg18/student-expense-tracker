@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-container {
+          background: #fff;
+          padding: 25px;
+          border-radius: 12px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          max-width: 450px;
+          margin: 60px auto;
+        }
+        .profile-container h2 {
+          text-align: center;
+          margin-bottom: 20px;
+          color: #333;
+        }
+        .profile-container label {
+          font-weight: bold;
+          display: block;
+          margin-top: 10px;
+          color: #444;
+        }
+        .profile-container input {
+          width: 100%;
+          padding: 10px;
+          margin-top: 5px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+        }
+        .profile-container button {
+          width: 100%;
+          margin-top: 20px;
+          padding: 12px;
+          background-color: #00a8cc;
+          color: white;
+          font-weight: bold;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
+        .profile-container button:hover {
+          background-color: #0088aa;
+        }
+        #errorMsg { text-align: center; color: red; margin-top: 10px; }
+        #successMsg { text-align: center; color: green; margin-top: 10px; }
+
+    </style>
+</head>
+<body>
+<div class="profile-container">
+    <h2>User Profile</h2>
+
+    <div id="errorMsg"></div>
+    <div id="successMsg"></div>
+
+    <form id="profileForm" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="rollNo">Roll No:</label>
+        <input type="text" id="rollNo" name="rollNo" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password (leave blank if unchanged):</label>
+        <input type="password" id="password" name="password">
+
+        <button type="submit">Update Profile</button>
+    </form>
+</div>
+
+<script>
+    async function loadProfile() {
+      const res = await fetch("/api/profile", { credentials: "include" });
+      if (res.ok) {
+        const user = await res.json();
+        document.getElementById("username").value = user.username;
+        document.getElementById("rollNo").value = user.rollNo;
+        document.getElementById("email").value = user.email;
+      } else {
+        window.location.href = "login.html"; // redirect if not logged in
+      }
+    }
+
+    document.getElementById("profileForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      const res = await fetch("/profile/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData),
+        credentials: "include"
+      });
+
+      const errorBox = document.getElementById("errorMsg");
+      const successBox = document.getElementById("successMsg");
+
+      errorBox.innerHTML = "";
+      successBox.innerHTML = "";
+
+      if (res.ok) {
+        const msg = await res.text();
+        successBox.innerText = msg;
+      } else {
+        try {
+          const errors = await res.json();
+          errorBox.innerHTML = errors.map(e => `<div>${e}</div>`).join("");
+        } catch {
+          const msg = await res.text();
+          errorBox.innerText = msg;
+        }
+      }
+    });
+
+    loadProfile();
+</script>
+</body>
+</html>
